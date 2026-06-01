@@ -20,17 +20,20 @@ export default function Home() {
         <section className="grid gap-4 lg:grid-cols-3">
           <PlanCard
             name="START"
+            plan="start"
             price="R$ 50/mês"
             features={["Agenda", "Clientes", "Financeiro", "Controle 60/20/20"]}
           />
           <PlanCard
             name="PRO"
+            plan="pro"
             price="R$ 79/mês"
             featured
             features={["Tudo do Start", "WhatsApp Automático", "Metas", "Recuperação de Clientes"]}
           />
           <PlanCard
             name="PREMIUM"
+            plan="premium"
             price="R$ 129/mês"
             features={["Tudo do Pro", "IA de Retenção", "Campanhas WhatsApp", "Dashboard Avançado"]}
           />
@@ -47,7 +50,7 @@ export default function Home() {
   );
 }
 
-function PlanCard({ name, price, features, featured = false }: { name: string; price: string; features: string[]; featured?: boolean }) {
+function PlanCard({ name, plan, price, features, featured = false }: { name: string; plan: string; price: string; features: string[]; featured?: boolean }) {
   return (
     <article className={`rounded-lg border p-5 shadow-soft ${featured ? "border-jade bg-ink text-white" : "border-black/5 bg-white/85 text-ink"}`}>
       <p className={`text-sm font-semibold uppercase tracking-[0.18em] ${featured ? "text-white/70" : "text-jade"}`}>{name}</p>
@@ -62,7 +65,7 @@ function PlanCard({ name, price, features, featured = false }: { name: string; p
           </p>
         ))}
       </div>
-      <a href="/dashboard" className={`mt-6 flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-semibold transition ${featured ? "bg-white text-ink hover:bg-mist" : "bg-ink text-white hover:bg-jade"}`}>
+      <a href={`/dashboard?plan=${plan}`} className={`mt-6 flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-semibold transition ${featured ? "bg-white text-ink hover:bg-mist" : "bg-ink text-white hover:bg-jade"}`}>
         Assinar
       </a>
     </article>

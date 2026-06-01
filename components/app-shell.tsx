@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { BarChart3, CalendarDays, DatabaseBackup, Lock, Megaphone, Menu, MessageCircle, SettingsIcon, ShieldCheck, Sparkles, Target } from "lucide-react";
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { BarChart3, CalendarDays, DatabaseBackup, Megaphone, Menu, MessageCircle, SettingsIcon, ShieldCheck, Sparkles, Target } from "lucide-react";
 import { AuthPanel } from "@/components/auth-panel";
 import { Clients } from "@/components/clients";
 import { Dashboard } from "@/components/dashboard";
@@ -14,6 +16,7 @@ import { Settings } from "@/components/settings";
 import { WhatsappAutomation } from "@/components/whatsapp-automation";
 import { canAccessModule, ClientModule } from "@/lib/access-control";
 import { company } from "@/lib/mock-data";
+import { CompanyPlan } from "@/lib/types";
 
 type TabId = ClientModule;
 
@@ -78,11 +81,33 @@ const titles: Record<TabId, { eyebrow: string; title: string; subtitle: string }
 };
 
 export function AppShell() {
+  const searchParams = useSearchParams();
+  const queryPlan = searchParams.get("plan") as CompanyPlan | null;
+  const initialPlan = queryPlan && ["start", "pro", "premium"].includes(queryPlan) ? queryPlan : company.plan;
+  const [selectedPlan, setSelectedPlan] = useState<CompanyPlan>(initialPlan);
   const [activeTab, setActiveTab] = useState<TabId>("agenda");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const activeTitle = titles[activeTab];
-  const allowedModules = nav.filter((item) => canAccessModule(company.plan, item.id));
-  const blockedModules = nav.filter((item) => !canAccessModule(company.plan, item.id));
+  const allowedModules = nav.filter((item) => canAccessModule(selectedPlan, item.id));
+
+  useEffect(() => {
+    if (queryPlan && ["start", "pro", "premium"].includes(queryPlan)) {
+      setSelectedPlan(queryPlan);
+      window.localStorage.setItem("estetica.selectedPlan", queryPlan);
+      return;
+    }
+
+    const savedPlan = window.localStorage.getItem("estetica.selectedPlan") as CompanyPlan | null;
+    if (savedPlan && ["start", "pro", "premium"].includes(savedPlan)) {
+      setSelectedPlan(savedPlan);
+    }
+  }, [queryPlan]);
+
+  useEffect(() => {
+    if (!canAccessModule(selectedPlan, activeTab)) {
+      setActiveTab("dashboard");
+    }
+  }, [activeTab, selectedPlan]);
 
   return (
     <main className="min-h-screen">
@@ -96,7 +121,7 @@ export function AppShell() {
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-jade">Studio</p>
               <h1 className="truncate text-lg font-bold text-ink">{company.name}</h1>
-              <p className="text-xs font-semibold uppercase text-moss">Plano {company.plan}</p>
+              <p className="text-xs font-semibold uppercase text-moss">Plano {selectedPlan}</p>
             </div>
           ) : null}
           <button
@@ -126,22 +151,6 @@ export function AppShell() {
               <span className={`truncate transition-all duration-200 ${sidebarOpen ? "max-w-40 opacity-100" : "max-w-0 opacity-0"}`}>
                 {item.label}
               </span>
-            </button>
-          ))}
-          {blockedModules.map((item) => (
-            <button
-              key={item.id}
-              className={`group flex h-12 items-center rounded-lg text-sm font-semibold text-black/30 transition ${
-                sidebarOpen ? "justify-start gap-3 px-3" : "justify-center px-0"
-              }`}
-              type="button"
-              title={`${item.label} bloqueado no plano ${company.plan}`}
-            >
-              <item.icon size={20} className="shrink-0" />
-              <span className={`truncate transition-all duration-200 ${sidebarOpen ? "max-w-40 opacity-100" : "max-w-0 opacity-0"}`}>
-                {item.label}
-              </span>
-              {sidebarOpen ? <Lock size={14} className="ml-auto" /> : null}
             </button>
           ))}
         </nav>
