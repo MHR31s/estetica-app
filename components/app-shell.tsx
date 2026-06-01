@@ -1,30 +1,39 @@
 "use client";
 
 import { useState } from "react";
-import { BarChart3, CalendarDays, DatabaseBackup, Menu, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
+import { BarChart3, CalendarDays, DatabaseBackup, Megaphone, Menu, MessageCircle, SettingsIcon, ShieldCheck, Sparkles, Target, UsersRound } from "lucide-react";
+import { AdminMaster } from "@/components/admin-master";
 import { AuthPanel } from "@/components/auth-panel";
 import { Clients } from "@/components/clients";
 import { Dashboard } from "@/components/dashboard";
 import { Finance } from "@/components/finance";
+import { Goals } from "@/components/goals";
+import { Marketing } from "@/components/marketing";
 import { Reports } from "@/components/reports";
 import { Schedule } from "@/components/schedule";
+import { Settings } from "@/components/settings";
 import { WhatsappAutomation } from "@/components/whatsapp-automation";
+import { company } from "@/lib/mock-data";
 
-type TabId = "dashboard" | "clientes" | "agenda" | "financeiro" | "relatorios" | "whatsapp";
+type TabId = "dashboard" | "agenda" | "clientes" | "financeiro" | "relatorios" | "metas" | "marketing" | "whatsapp" | "configuracoes" | "admin";
 
 const nav: { id: TabId; label: string; icon: typeof BarChart3 }[] = [
+  { id: "dashboard", label: "Dashboard", icon: BarChart3 },
   { id: "agenda", label: "Agenda", icon: CalendarDays },
-  { id: "clientes", label: "Cliente", icon: Sparkles },
-  { id: "whatsapp", label: "WhatsApp", icon: MessageCircle },
-  { id: "relatorios", label: "Relatorios", icon: DatabaseBackup },
+  { id: "clientes", label: "Clientes", icon: Sparkles },
   { id: "financeiro", label: "Financeiro", icon: ShieldCheck },
-  { id: "dashboard", label: "Dashboard", icon: BarChart3 }
+  { id: "relatorios", label: "Relatorios", icon: DatabaseBackup },
+  { id: "metas", label: "Metas", icon: Target },
+  { id: "marketing", label: "Marketing", icon: Megaphone },
+  { id: "whatsapp", label: "WhatsApp", icon: MessageCircle },
+  { id: "configuracoes", label: "Configuracoes", icon: SettingsIcon },
+  { id: "admin", label: "Admin Master", icon: UsersRound }
 ];
 
 const titles: Record<TabId, { eyebrow: string; title: string; subtitle: string }> = {
   dashboard: {
     eyebrow: "Painel inicial",
-    title: "Bom dia, Studio Bella",
+    title: `Bom dia, ${company.name}`,
     subtitle: "Sabado, 30 de maio - indicadores gerais"
   },
   clientes: {
@@ -51,6 +60,26 @@ const titles: Record<TabId, { eyebrow: string; title: string; subtitle: string }
     eyebrow: "Automacoes",
     title: "WhatsApp",
     subtitle: "Confirmacoes, lembretes e backup automatico"
+  },
+  metas: {
+    eyebrow: "Crescimento",
+    title: "Metas",
+    subtitle: "Meta diaria, semanal, mensal e valor faltante"
+  },
+  marketing: {
+    eyebrow: "Retencao",
+    title: "Marketing",
+    subtitle: "Recuperacao de clientes inativas e campanhas"
+  },
+  configuracoes: {
+    eyebrow: "Empresa",
+    title: "Configuracoes",
+    subtitle: "Marca, cores, mensagens automaticas e plano"
+  },
+  admin: {
+    eyebrow: "SaaS",
+    title: "Admin Master",
+    subtitle: "Empresas, planos, assinaturas e MRR"
   }
 };
 
@@ -70,7 +99,8 @@ export function AppShell() {
           {sidebarOpen ? (
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-jade">Studio</p>
-              <h1 className="truncate text-lg font-bold text-ink">Estetica</h1>
+              <h1 className="truncate text-lg font-bold text-ink">{company.name}</h1>
+              <p className="text-xs font-semibold uppercase text-moss">Plano {company.plan}</p>
             </div>
           ) : null}
           <button
@@ -132,6 +162,10 @@ export function AppShell() {
           {activeTab === "financeiro" ? <Finance /> : null}
           {activeTab === "relatorios" ? <Reports /> : null}
           {activeTab === "whatsapp" ? <WhatsappAutomation /> : null}
+          {activeTab === "metas" ? <Goals /> : null}
+          {activeTab === "marketing" ? <Marketing /> : null}
+          {activeTab === "configuracoes" ? <Settings /> : null}
+          {activeTab === "admin" ? <AdminMaster /> : null}
         </section>
       </div>
     </main>

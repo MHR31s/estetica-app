@@ -1,4 +1,23 @@
-import { Appointment, Client, Transaction } from "@/lib/types";
+import { Appointment, Client, Company, Transaction } from "@/lib/types";
+
+export const company: Company = {
+  id: "studio-bella",
+  name: "Studio Bella",
+  logoUrl: "",
+  primaryColor: "#2f9b7c",
+  secondaryColor: "#dc6f61",
+  whatsapp: "5511999990000",
+  email: "contato@studiobella.com",
+  plan: "pro",
+  monthlyGoal: 12000,
+  active: true,
+  automaticMessages: {
+    confirmation: "Seu horario esta confirmado.",
+    reminder24h: "Lembrando seu atendimento amanha.",
+    afterCare: "Obrigada pela confianca.",
+    inactiveClient: "Sentimos sua falta. Temos horarios disponiveis."
+  }
+};
 
 export const clients: Client[] = [
   {
@@ -6,6 +25,11 @@ export const clients: Client[] = [
     name: "Marina Lopes",
     phone: "(11) 98411-2200",
     whatsapp: "5511984112200",
+    birthDate: "1992-06-12",
+    lastAppointmentAt: "2026-05-30",
+    totalSpent: 860,
+    returnFrequencyDays: 28,
+    tags: ["VIP", "Ativa"],
     history: "Limpeza de pele, peeling de diamante",
     notes: "Pele sensivel. Prefere horarios pela manha."
   },
@@ -14,6 +38,11 @@ export const clients: Client[] = [
     name: "Bianca Prado",
     phone: "(11) 97742-8101",
     whatsapp: "5511977428101",
+    birthDate: "1988-05-31",
+    lastAppointmentAt: "2026-05-30",
+    totalSpent: 540,
+    returnFrequencyDays: 21,
+    tags: ["Ativa"],
     history: "Drenagem linfatica",
     notes: "Pacote mensal ativo."
   },
@@ -22,6 +51,11 @@ export const clients: Client[] = [
     name: "Clara Mendes",
     phone: "(11) 96502-3310",
     whatsapp: "5511965023310",
+    birthDate: "1996-07-03",
+    lastAppointmentAt: "2026-03-01",
+    totalSpent: 190,
+    returnFrequencyDays: 90,
+    tags: ["Inativa"],
     history: "Design de sobrancelhas",
     notes: "Enviar lembrete com orientacoes pos-atendimento."
   }

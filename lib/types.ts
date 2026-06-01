@@ -3,8 +3,35 @@ export type Client = {
   name: string;
   phone: string;
   whatsapp: string;
+  birthDate?: string;
+  photoUrl?: string;
+  lastAppointmentAt?: string;
+  totalSpent?: number;
+  returnFrequencyDays?: number;
+  tags?: string[];
   history: string;
   notes: string;
+};
+
+export type CompanyPlan = "start" | "pro" | "premium";
+
+export type Company = {
+  id: string;
+  name: string;
+  logoUrl: string;
+  primaryColor: string;
+  secondaryColor: string;
+  whatsapp: string;
+  email: string;
+  plan: CompanyPlan;
+  monthlyGoal: number;
+  active: boolean;
+  automaticMessages: {
+    confirmation: string;
+    reminder24h: string;
+    afterCare: string;
+    inactiveClient: string;
+  };
 };
 
 export type AppointmentStatus =
