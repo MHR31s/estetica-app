@@ -80,10 +80,10 @@ const titles: Record<TabId, { eyebrow: string; title: string; subtitle: string }
   }
 };
 
-export function AppShell() {
+export function AppShell({ forcedPlan }: { forcedPlan?: CompanyPlan }) {
   const searchParams = useSearchParams();
   const queryPlan = searchParams.get("plan") as CompanyPlan | null;
-  const initialPlan = queryPlan && ["start", "pro", "premium"].includes(queryPlan) ? queryPlan : company.plan;
+  const initialPlan = forcedPlan ?? (queryPlan && ["start", "pro", "premium"].includes(queryPlan) ? queryPlan : company.plan);
   const [selectedPlan, setSelectedPlan] = useState<CompanyPlan>(initialPlan);
   const [activeTab, setActiveTab] = useState<TabId>("agenda");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -91,6 +91,12 @@ export function AppShell() {
   const allowedModules = nav.filter((item) => canAccessModule(selectedPlan, item.id));
 
   useEffect(() => {
+    if (forcedPlan) {
+      setSelectedPlan(forcedPlan);
+      window.localStorage.setItem("estetica.selectedPlan", forcedPlan);
+      return;
+    }
+
     if (queryPlan && ["start", "pro", "premium"].includes(queryPlan)) {
       setSelectedPlan(queryPlan);
       window.localStorage.setItem("estetica.selectedPlan", queryPlan);
@@ -101,7 +107,7 @@ export function AppShell() {
     if (savedPlan && ["start", "pro", "premium"].includes(savedPlan)) {
       setSelectedPlan(savedPlan);
     }
-  }, [queryPlan]);
+  }, [forcedPlan, queryPlan]);
 
   useEffect(() => {
     if (!canAccessModule(selectedPlan, activeTab)) {

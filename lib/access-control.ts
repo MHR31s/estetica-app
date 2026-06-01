@@ -12,7 +12,7 @@ export type ClientModule =
   | "configuracoes";
 
 export const planAccess: Record<CompanyPlan, ClientModule[]> = {
-  start: ["dashboard", "agenda", "clientes", "financeiro", "configuracoes"],
+  start: ["dashboard", "agenda", "clientes", "financeiro"],
   pro: ["dashboard", "agenda", "clientes", "financeiro", "relatorios", "metas", "whatsapp", "configuracoes"],
   premium: ["dashboard", "agenda", "clientes", "financeiro", "relatorios", "metas", "marketing", "whatsapp", "configuracoes"]
 };
