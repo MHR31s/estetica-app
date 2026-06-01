@@ -12,7 +12,7 @@ export default function Home() {
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-jade">CRM Beauty Pro</p>
             <h1 className="mt-3 max-w-3xl text-4xl font-bold text-ink sm:text-5xl lg:text-6xl">Organize sua agenda, clientes e finanças em um só lugar.</h1>
           </div>
-          <a href="/dashboard/start" className="inline-flex items-center justify-center gap-2 rounded-lg bg-ink px-6 py-4 text-sm font-semibold text-white shadow-soft transition hover:bg-jade">
+          <a href="/login" className="inline-flex items-center justify-center gap-2 rounded-lg bg-ink px-6 py-4 text-sm font-semibold text-white shadow-soft transition hover:bg-jade">
             Começar Agora <ArrowRight size={17} />
           </a>
         </header>
@@ -41,7 +41,7 @@ export default function Home() {
 
         <footer className="mt-8 flex flex-col items-center justify-between gap-3 rounded-lg border border-black/5 bg-white/80 p-4 shadow-soft sm:flex-row">
           <p className="text-sm font-semibold text-moss">Já possui conta?</p>
-          <a href="/dashboard/start" className="inline-flex items-center justify-center rounded-lg border border-black/10 px-5 py-3 text-sm font-semibold text-ink transition hover:border-jade hover:text-jade">
+          <a href="/login" className="inline-flex items-center justify-center rounded-lg border border-black/10 px-5 py-3 text-sm font-semibold text-ink transition hover:border-jade hover:text-jade">
             Entrar
           </a>
         </footer>
@@ -65,7 +65,7 @@ function PlanCard({ name, plan, price, features, featured = false }: { name: str
           </p>
         ))}
       </div>
-      <a href={`/dashboard/${plan}`} className={`mt-6 flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-semibold transition ${featured ? "bg-white text-ink hover:bg-mist" : "bg-ink text-white hover:bg-jade"}`}>
+      <a href={`/login?plan=${plan}`} className={`mt-6 flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-semibold transition ${featured ? "bg-white text-ink hover:bg-mist" : "bg-ink text-white hover:bg-jade"}`}>
         Assinar
       </a>
     </article>
