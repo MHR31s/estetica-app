@@ -13,7 +13,12 @@ export function AuthPanel() {
     setMessage("Conectando...");
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setMessage(error ? error.message : "Login realizado. Atualize a pagina para carregar seus dados.");
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    setMessage("Login realizado. Redirecionando...");
+    window.location.href = "/";
   }
 
   async function signUp() {

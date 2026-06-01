@@ -14,6 +14,7 @@ export type Client = {
 };
 
 export type CompanyPlan = "start" | "pro" | "premium";
+export type UserRole = "master_admin" | "company_owner";
 
 export type Company = {
   id: string;

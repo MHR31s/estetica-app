@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BarChart3, CalendarDays, DatabaseBackup, Megaphone, Menu, MessageCircle, SettingsIcon, ShieldCheck, Sparkles, Target, UsersRound } from "lucide-react";
-import { AdminMaster } from "@/components/admin-master";
+import { BarChart3, CalendarDays, DatabaseBackup, Lock, Megaphone, Menu, MessageCircle, SettingsIcon, ShieldCheck, Sparkles, Target } from "lucide-react";
 import { AuthPanel } from "@/components/auth-panel";
 import { Clients } from "@/components/clients";
 import { Dashboard } from "@/components/dashboard";
@@ -13,9 +12,10 @@ import { Reports } from "@/components/reports";
 import { Schedule } from "@/components/schedule";
 import { Settings } from "@/components/settings";
 import { WhatsappAutomation } from "@/components/whatsapp-automation";
+import { canAccessModule, ClientModule } from "@/lib/access-control";
 import { company } from "@/lib/mock-data";
 
-type TabId = "dashboard" | "agenda" | "clientes" | "financeiro" | "relatorios" | "metas" | "marketing" | "whatsapp" | "configuracoes" | "admin";
+type TabId = ClientModule;
 
 const nav: { id: TabId; label: string; icon: typeof BarChart3 }[] = [
   { id: "dashboard", label: "Dashboard", icon: BarChart3 },
@@ -26,8 +26,7 @@ const nav: { id: TabId; label: string; icon: typeof BarChart3 }[] = [
   { id: "metas", label: "Metas", icon: Target },
   { id: "marketing", label: "Marketing", icon: Megaphone },
   { id: "whatsapp", label: "WhatsApp", icon: MessageCircle },
-  { id: "configuracoes", label: "Configuracoes", icon: SettingsIcon },
-  { id: "admin", label: "Admin Master", icon: UsersRound }
+  { id: "configuracoes", label: "Configuracoes", icon: SettingsIcon }
 ];
 
 const titles: Record<TabId, { eyebrow: string; title: string; subtitle: string }> = {
@@ -75,11 +74,6 @@ const titles: Record<TabId, { eyebrow: string; title: string; subtitle: string }
     eyebrow: "Empresa",
     title: "Configuracoes",
     subtitle: "Marca, cores, mensagens automaticas e plano"
-  },
-  admin: {
-    eyebrow: "SaaS",
-    title: "Admin Master",
-    subtitle: "Empresas, planos, assinaturas e MRR"
   }
 };
 
@@ -87,6 +81,8 @@ export function AppShell() {
   const [activeTab, setActiveTab] = useState<TabId>("agenda");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const activeTitle = titles[activeTab];
+  const allowedModules = nav.filter((item) => canAccessModule(company.plan, item.id));
+  const blockedModules = nav.filter((item) => !canAccessModule(company.plan, item.id));
 
   return (
     <main className="min-h-screen">
@@ -114,7 +110,7 @@ export function AppShell() {
         </div>
 
         <nav className="grid gap-2">
-          {nav.map((item) => (
+          {allowedModules.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
@@ -130,6 +126,22 @@ export function AppShell() {
               <span className={`truncate transition-all duration-200 ${sidebarOpen ? "max-w-40 opacity-100" : "max-w-0 opacity-0"}`}>
                 {item.label}
               </span>
+            </button>
+          ))}
+          {blockedModules.map((item) => (
+            <button
+              key={item.id}
+              className={`group flex h-12 items-center rounded-lg text-sm font-semibold text-black/30 transition ${
+                sidebarOpen ? "justify-start gap-3 px-3" : "justify-center px-0"
+              }`}
+              type="button"
+              title={`${item.label} bloqueado no plano ${company.plan}`}
+            >
+              <item.icon size={20} className="shrink-0" />
+              <span className={`truncate transition-all duration-200 ${sidebarOpen ? "max-w-40 opacity-100" : "max-w-0 opacity-0"}`}>
+                {item.label}
+              </span>
+              {sidebarOpen ? <Lock size={14} className="ml-auto" /> : null}
             </button>
           ))}
         </nav>
@@ -165,7 +177,6 @@ export function AppShell() {
           {activeTab === "metas" ? <Goals /> : null}
           {activeTab === "marketing" ? <Marketing /> : null}
           {activeTab === "configuracoes" ? <Settings /> : null}
-          {activeTab === "admin" ? <AdminMaster /> : null}
         </section>
       </div>
     </main>

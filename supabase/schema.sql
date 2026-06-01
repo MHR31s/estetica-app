@@ -27,6 +27,20 @@ create table if not exists public.company_members (
   unique (company_id, user_id)
 );
 
+create table if not exists public.roles (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  company_id uuid references public.companies(id) on delete cascade,
+  role text not null check (role in ('master_admin', 'company_owner')),
+  created_at timestamptz not null default now(),
+  unique (user_id, role, company_id),
+  check (
+    (role = 'master_admin' and company_id is null)
+    or
+    (role = 'company_owner' and company_id is not null)
+  )
+);
+
 create table if not exists public.clients (
   id uuid primary key default gen_random_uuid(),
   company_id uuid not null references public.companies(id) on delete cascade,
@@ -120,6 +134,7 @@ create table if not exists public.subscriptions (
 
 alter table public.companies enable row level security;
 alter table public.company_members enable row level security;
+alter table public.roles enable row level security;
 alter table public.clients enable row level security;
 alter table public.appointments enable row level security;
 alter table public.appointment_status_history enable row level security;
@@ -127,7 +142,7 @@ alter table public.transactions enable row level security;
 alter table public.financial_allocations enable row level security;
 alter table public.subscriptions enable row level security;
 
-create or replace function public.user_has_company_access(target_company_id uuid)
+create or replace function public.is_master_admin()
 returns boolean
 language sql
 security definer
@@ -135,9 +150,29 @@ set search_path = public
 as $$
   select exists (
     select 1
+    from public.roles
+    where roles.user_id = auth.uid()
+      and roles.role = 'master_admin'
+  );
+$$;
+
+create or replace function public.user_has_company_access(target_company_id uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select public.is_master_admin() or exists (
+    select 1
     from public.company_members
     where company_members.company_id = target_company_id
       and company_members.user_id = auth.uid()
+  ) or exists (
+    select 1
+    from public.roles
+    where roles.company_id = target_company_id
+      and roles.user_id = auth.uid()
+      and roles.role = 'company_owner'
   );
 $$;
 
@@ -147,9 +182,27 @@ create policy "members can read their companies" on public.companies
 create policy "members can update their companies" on public.companies
   for update using (public.user_has_company_access(id)) with check (public.user_has_company_access(id));
 
+create policy "master can create companies" on public.companies
+  for insert with check (public.is_master_admin());
+
+create policy "master can delete companies" on public.companies
+  for delete using (public.is_master_admin());
+
 create policy "company members are scoped" on public.company_members
-  for all using (user_id = auth.uid() or public.user_has_company_access(company_id))
-  with check (user_id = auth.uid() or public.user_has_company_access(company_id));
+  for all using (public.is_master_admin() or user_id = auth.uid() or public.user_has_company_access(company_id))
+  with check (public.is_master_admin() or user_id = auth.uid() or public.user_has_company_access(company_id));
+
+create policy "users can read own role and master can read all" on public.roles
+  for select using (user_id = auth.uid() or public.is_master_admin());
+
+create policy "only master can create roles" on public.roles
+  for insert with check (public.is_master_admin());
+
+create policy "only master can update roles" on public.roles
+  for update using (public.is_master_admin()) with check (public.is_master_admin());
+
+create policy "only master can delete roles" on public.roles
+  for delete using (public.is_master_admin());
 
 create policy "clients are scoped by company" on public.clients
   for all using (public.user_has_company_access(company_id)) with check (public.user_has_company_access(company_id));
